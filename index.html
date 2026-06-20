@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Generator Pro — Generate Secure Password Easily</title>
+  <meta name="description" content="Aplikasi edukasi untuk mempelajari algoritma pembentukan password yang aman, mengukur kekuatan password, dan menganalisis entropy." />
+  <link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg" />
+
+  <!-- Font: Space Grotesk untuk display/heading, Inter untuk body, JetBrains Mono untuk data/password -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+
+  <!-- Lapisan dekoratif: garis grid tipis ala dashboard keamanan -->
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <div class="app-shell">
+
+    <!-- ============ HEADER ============ -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+            <path d="M12 2 L20 5.5 V11 C20 16.5 16.5 20.5 12 22 C7.5 20.5 4 16.5 4 11 V5.5 Z" fill="currentColor" opacity="0.18"/>
+            <path d="M12 2 L20 5.5 V11 C20 16.5 16.5 20.5 12 22 C7.5 20.5 4 16.5 4 11 V5.5 Z" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M9 11.2 V9 a3 3 0 0 1 6 0 v2.2" stroke="currentColor" stroke-width="1.4" fill="none"/>
+            <rect x="8" y="11" width="8" height="6.2" rx="1.4" fill="currentColor"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>Password Generator <span class="accent-text">Pro</span></h1>
+          <p>Generate Secure Password Easily</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Local-only · Tidak ada data terkirim ke server</span>
+      </div>
+    </header>
+
+    <!-- ============ MAIN GRID ============ -->
+    <main class="main-grid">
+
+      <!-- ===== KOLOM KIRI ===== -->
+      <section class="col col-left">
+
+        <!-- CARD: GENERATOR -->
+        <div class="card" id="card-generator">
+          <div class="card-head">
+            <h2><span class="card-index">01</span> Generator</h2>
+            <p class="card-sub">Atur parameter, lalu buat password baru</p>
+          </div>
+
+          <div class="field">
+            <div class="field-label-row">
+              <label for="length-slider">Panjang Password</label>
+              <output id="length-value" for="length-slider">16</output>
+            </div>
+            <input type="range" id="length-slider" min="8" max="64" value="16" step="1" />
+            <div class="slider-scale" aria-hidden="true"><span>8</span><span>64</span></div>
+          </div>
+
+          <fieldset class="field charset-options">
+            <legend>Jenis Karakter</legend>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="opt-lower" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              <span class="checkbox-text">Huruf Kecil <code>a-z</code></span>
+            </label>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="opt-upper" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              <span class="checkbox-text">Huruf Besar <code>A-Z</code></span>
+            </label>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="opt-number" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              <span class="checkbox-text">Angka <code>0-9</code></span>
+            </label>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="opt-symbol" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              <span class="checkbox-text">Simbol <code>!@#$%^&amp;*</code></span>
+            </label>
+
+            <label class="checkbox-row checkbox-row-secondary">
+              <input type="checkbox" id="opt-ambiguous" checked />
+              <span class="checkbox-box" aria-hidden="true"></span>
+              <span class="checkbox-text">
+                Sertakan Karakter Ambigu
+                <small>Jika dimatikan, karakter seperti <code>i l 1 I O 0</code> dihapus agar mudah dibaca</small>
+              </span>
+            </label>
+          </fieldset>
+
+          <p class="inline-error" id="generator-error" role="alert" hidden></p>
+
+          <button type="button" class="btn btn-primary btn-block" id="btn-generate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M4 12h4l2 5 4-10 2 5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Generate Password
+          </button>
+        </div>
+
+        <!-- CARD: HASIL -->
+        <div class="card" id="card-result">
+          <div class="card-head">
+            <h2><span class="card-index">02</span> Hasil</h2>
+            <p class="card-sub">Password yang baru dibuat</p>
+          </div>
+
+          <div class="terminal" id="password-terminal">
+            <div class="terminal-bar">
+              <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+              <span class="terminal-title">output.txt</span>
+            </div>
+            <div class="terminal-body">
+              <span class="terminal-prompt">$</span>
+              <span class="terminal-output" id="password-output" data-empty="true">Tekan &quot;Generate Password&quot;…</span>
+              <span class="terminal-cursor" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button type="button" class="btn btn-secondary" id="btn-copy" disabled>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V5a2 2 0 0 1 2-2h10" stroke="currentColor" stroke-width="1.8"/></svg>
+              Copy Password
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-regenerate" disabled>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true"><path d="M4 4v5h5M20 20v-5h-5M5.6 9a7 7 0 0 1 12-3.5L20 8M18.4 15a7 7 0 0 1-12 3.5L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Generate Ulang
+            </button>
+          </div>
+
+          <div class="strength-block">
+            <div class="strength-label-row">
+              <span>Kekuatan Password</span>
+              <span class="strength-tag" id="strength-tag">—</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="strength-progress">
+              <div class="progress-fill" id="strength-fill"></div>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric">
+              <span class="metric-label">Skor</span>
+              <span class="metric-value" id="strength-score">0<small>/100</small></span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Entropy</span>
+              <span class="metric-value" id="entropy-value">0<small>bits</small></span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ===== KOLOM KANAN ===== -->
+      <section class="col col-right">
+
+        <!-- CARD: ANALYZER -->
+        <div class="card" id="card-analyzer">
+          <div class="card-head">
+            <h2><span class="card-index">03</span> Password Analyzer</h2>
+            <p class="card-sub">Periksa kekuatan password milikmu sendiri</p>
+          </div>
+
+          <div class="field">
+            <label for="analyzer-input">Masukkan Password</label>
+            <div class="input-with-toggle">
+              <input type="password" id="analyzer-input" placeholder="Ketik atau tempel password di sini…" autocomplete="off" />
+              <button type="button" class="icon-toggle" id="btn-toggle-visibility" aria-label="Tampilkan password">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="checklist" id="analyzer-checklist">
+            <div class="checklist-item" data-key="length">
+              <span class="checklist-icon" aria-hidden="true"></span>
+              <span>Minimal 12 karakter</span>
+            </div>
+            <div class="checklist-item" data-key="lower">
+              <span class="checklist-icon" aria-hidden="true"></span>
+              <span>Mengandung huruf kecil</span>
+            </div>
+            <div class="checklist-item" data-key="upper">
+              <span class="checklist-icon" aria-hidden="true"></span>
+              <span>Mengandung huruf besar</span>
+            </div>
+            <div class="checklist-item" data-key="number">
+              <span class="checklist-icon" aria-hidden="true"></span>
+              <span>Mengandung angka</span>
+            </div>
+            <div class="checklist-item" data-key="symbol">
+              <span class="checklist-icon" aria-hidden="true"></span>
+              <span>Mengandung simbol</span>
+            </div>
+          </div>
+
+          <div class="recommend-box" id="analyzer-recommend">
+            <p class="recommend-title">Rekomendasi</p>
+            <ul id="recommend-list">
+              <li class="recommend-empty">Masukkan password untuk melihat rekomendasi.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- CARD: EDUKASI -->
+        <div class="card" id="card-education">
+          <div class="card-head">
+            <h2><span class="card-index">04</span> Apa itu Password Kuat?</h2>
+            <p class="card-sub">Dasar-dasar keamanan password</p>
+          </div>
+          <ul class="education-list">
+            <li><strong>Minimal 12 karakter</strong> — semakin panjang, semakin besar ruang kemungkinan yang harus ditebak penyerang.</li>
+            <li><strong>Kombinasikan huruf besar &amp; kecil</strong> — memperluas variasi karakter pada setiap posisi.</li>
+            <li><strong>Gunakan angka</strong> — menambah jumlah simbol unik dalam character set.</li>
+            <li><strong>Gunakan simbol</strong> — character set yang lebih besar = entropy lebih tinggi.</li>
+            <li><strong>Hindari kata umum &amp; pola</strong> — "password123" tetap lemah meski panjang, karena mudah ditebak.</li>
+          </ul>
+          <div class="entropy-note">
+            <strong>Entropy</strong> mengukur seberapa acak sebuah password, dalam satuan <em>bits</em>. Dihitung dengan rumus sederhana:
+            <code>Entropy = panjang × log₂(ukuran character set)</code>.
+            Semakin tinggi nilainya, semakin lama waktu yang dibutuhkan untuk menebak password secara brute-force.
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ===== CARD: RIWAYAT (full width) ===== -->
+    <section class="card card-history" id="card-history">
+      <div class="card-head card-head-row">
+        <div>
+          <h2><span class="card-index">05</span> Riwayat Password</h2>
+          <p class="card-sub">10 password terakhir yang dibuat di perangkat ini</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-small" id="btn-clear-history">Hapus Riwayat</button>
+      </div>
+
+      <div class="history-table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Password</th>
+              <th>Kekuatan</th>
+              <th>Tanggal Dibuat</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <tr class="history-empty-row">
+              <td colspan="4">Belum ada riwayat. Password yang kamu generate akan muncul di sini.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <p>Dibuat untuk tujuan studi &amp; pembelajaran algoritma keamanan password. Seluruh proses berjalan 100% di browser — tidak ada password yang dikirim ke server mana pun.</p>
+    </footer>
+
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
